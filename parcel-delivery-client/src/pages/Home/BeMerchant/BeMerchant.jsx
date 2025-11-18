@@ -1,15 +1,8 @@
-import img from '../../../assets/be-a-merchant-bg.png';
+// import img from '../../../assets/be-a-merchant-bg.png';
 import banner from '../../../assets/location-merchant.png';
-const CustomerSatasfy = () => {
+const BeMerchant = () => {
   return (
-    <div
-      className="hero bg-[#03373D] my-10 rounded-2xl h-[500px] md:h-[430px] "
-      style={{
-        backgroundImage: `url(${img})`,
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-      }}
-    >
+    <div className=" bg-[url('assets/be-a-merchant-bg.png')] bg-[#03373D] bg-no-repeat my-10 rounded-2xl h-[500px] md:h-[430px] ">
       <div className="hero-content flex-col lg:flex-row-reverse flex justify-baseline items-center">
         <img
           src={banner}
@@ -19,6 +12,7 @@ const CustomerSatasfy = () => {
           data-aos-duration="1500"
         />
         <div
+          className="p-5"
           data-aos="zoom-in-right"
           data-aos-easing="linear"
           data-aos-duration="1500"
@@ -32,10 +26,10 @@ const CustomerSatasfy = () => {
             parcels in every corner of Bangladesh right on time.
           </p>
           <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-5">
-            <button className="btn  bg-[#CAEB66] text-[#1F1F1F] rounded-3xl">
+            <button className="btn  bg-primary text-[#1F1F1F] rounded-3xl">
               Become a Merchant
             </button>
-            <button className="btn  rounded-3xl bg-[#03373D]  text-[#CAEB66]">
+            <button className="btn  rounded-3xl bg-[#03373D] text-[#CAEB66]">
               Earn with ZapShift Courier
             </button>
           </div>
@@ -45,4 +39,4 @@ const CustomerSatasfy = () => {
   );
 };
 
-export default CustomerSatasfy;
+export default BeMerchant;
