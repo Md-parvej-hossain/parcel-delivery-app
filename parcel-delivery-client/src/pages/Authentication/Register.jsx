@@ -1,10 +1,10 @@
-/* eslint-disable react-hooks/incompatible-library */
 import { Link } from 'react-router';
 import authImg from '../../assets/authImage.png';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../hooks/useAuth';
-const Login = () => {
-  const { signInUser, googleSignIn } = useAuth();
+
+const Register = () => {
+  const { createUser, googleSignIn } = useAuth();
   const {
     register,
     handleSubmit,
@@ -14,11 +14,12 @@ const Login = () => {
   const onSubmit = async data => {
     console.log(data);
     try {
-      const result = await signInUser(data.email, data.password);
+      const result = await createUser(data.email, data.password);
       console.log(result);
     } catch (err) {
-      console.log(err);
+      console.log(err.massage);
     }
+    createUser(data.email, data.password);
   };
   const handleGoogleSignIn = async () => {
     try {
@@ -36,8 +37,8 @@ const Login = () => {
         data-aos-duration="1500"
       >
         <div className="mb-8 text-center">
-          <h1 className="my-3 text-4xl font-bold">Welcome Back</h1>
-          <p className="text-sm dark:text-gray-600">Login with ZapShift</p>
+          <h1 className="my-3 text-4xl font-bold">Create an Account</h1>
+          <p className="text-sm dark:text-gray-600">Register with ZapShift</p>
         </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -48,6 +49,22 @@ const Login = () => {
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block mb-2 text-sm">
+                Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                {...register('name', { required: true })}
+                placeholder="Your name "
+                className="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800"
+              />
+              {errors?.name?.type === 'required' && (
+                <p className="text-red-500">Password is required </p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="email" className="block mb-2 text-sm">
                 Email address
               </label>
               <input
@@ -55,7 +72,7 @@ const Login = () => {
                 name="email"
                 id="email"
                 {...register('email', { required: true })}
-                placeholder="leroy@jenkins.com"
+                placeholder="Enter Your Email leroy@jenkins.com"
                 className="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800"
               />
               {errors?.email?.type === 'required' && (
@@ -67,13 +84,6 @@ const Login = () => {
                 <label htmlFor="password" className="text-sm">
                   Password
                 </label>
-                <a
-                  rel="noopener noreferrer"
-                  href="#"
-                  className="text-xs hover:underline dark:text-gray-600"
-                >
-                  Forgot password?
-                </a>
               </div>
               <input
                 type="password"
@@ -97,14 +107,14 @@ const Login = () => {
                 type="submit"
                 className="w-full px-8 py-3 font-semibold  bg-primary rounded-md hover:cursor-pointer hover:shadow-md"
               >
-                Sign in
+                Register
               </button>
             </div>
             <p className="px-6 text-sm text-center dark:text-gray-600">
-              Don’t have any account?{' '}
-              <Link className="text-secondary" to={'/register'}>
-                Register
-              </Link>
+              Already have an account?{' '}
+              <Link className="text-secondary" to={'/login'}>
+                Login
+              </Link>{' '}
               .
             </p>
           </div>
@@ -152,4 +162,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

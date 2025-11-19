@@ -34,11 +34,11 @@ const HowItWorks = () => {
         How It Works
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 py-5">
         {steps.map(step => (
           <div
             key={step.id}
-            className="bg-white  rounded-xl py-6 shadow-sm hover:shadow-md transition-all text-center"
+            className="bg-white  rounded-xl py-6 shadow-sm hover:shadow-md transition-all text-center my-5"
             data-aos="zoom-in-up"
             data-aos-easing="linear"
             data-aos-duration="1500"
@@ -48,7 +48,7 @@ const HowItWorks = () => {
 
             <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
 
-            <p className="text-gray-600 text-sm leading-relaxed">{step.desc}</p>
+            <p className="text-gray-600 text-sm leading-relaxed px-3">{step.desc}</p>
           </div>
         ))}
       </div>

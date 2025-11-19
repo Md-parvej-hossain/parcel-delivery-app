@@ -57,9 +57,7 @@ export default function ReviewSlider() {
     <div className="py-10">
       <div
         className="max-w-4xl mx-auto text-center mb-10"
-        data-aos="zoom-out-down"
-        data-aos-easing="ease-out-cubic"
-        data-aos-duration="1000"
+       
       >
         <div className="flex items-center justify-center py-5">
           <img className="" src={img} alt="" />
@@ -73,7 +71,7 @@ export default function ReviewSlider() {
         </p>
       </div>
       <Marquee speed={80} pauseOnHover={true} gradient={false}>
-        <div className="flex gap-5 mx-5 w-full">
+        <div className="flex gap-5 mx-5 ">
           {reviews.map((item, index) => (
             <RevioCard key={index} item={item} />
           ))}

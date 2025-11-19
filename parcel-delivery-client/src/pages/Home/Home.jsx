@@ -1,4 +1,5 @@
 import Banner from '../../components/Banner/Banner';
+import Loading from '../../components/loading/loading';
 import BeMerchant from './BeMerchant/BeMerchant';
 import ReviewSlider from './CustomerReviews/ReviewSlider';
 import HowItWorks from './HowItWorks/HowItWorks';
@@ -8,7 +9,7 @@ import Support from './support/Support';
 
 const Home = () => {
   return (
-    <div >
+    <div>
       <div
         data-aos="fade-right"
         data-aos-easing="linear"
@@ -17,6 +18,7 @@ const Home = () => {
         {' '}
         <Banner />
       </div>
+
       <div>
         <HowItWorks />
       </div>

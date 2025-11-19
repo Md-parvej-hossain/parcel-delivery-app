@@ -1,7 +1,12 @@
-import { NavLink } from 'react-router';
+import { Link, NavLink } from 'react-router';
 import ZapShiftLogo from '../Logo/ZapShiftLogo';
-
+import { FaArrowCircleUp } from 'react-icons/fa';
+import useAuth from '../../../hooks/useAuth';
 const Navbar = () => {
+  const { user, signOutUser } = useAuth();
+  const handleSignOut = () => {
+    signOutUser();
+  };
   const navLinks = (
     <>
       <li className="font-medium text-base text-[#606060]">
@@ -11,7 +16,7 @@ const Navbar = () => {
         <NavLink to={'/about'}>Services</NavLink>
       </li>
       <li className="font-medium text-base text-[#606060]">
-        <NavLink to={'/about'}>Coverage</NavLink>
+        <NavLink to={'/coverage'}>Coverage</NavLink>
       </li>
       <li className="font-medium text-base text-[#606060]">
         <NavLink to={'/about'}>About Us</NavLink>
@@ -56,15 +61,36 @@ const Navbar = () => {
             {navLinks}
           </ul>
         </div>
-        <a className="text-xl">
+        <Link to={'/'} className="text-xl ">
           <ZapShiftLogo />
-        </a>
+        </Link>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 z-50">{navLinks}</ul>
       </div>
       <div className="navbar-end">
-        <a className="btn">Button</a>
+        <div className="space-x-2 md:space-x-3">
+          {user ? (
+            <Link
+              onClick={handleSignOut}
+              className="btn btn-sm md:btn-md rounded-lg"
+            >
+              Sign Out
+            </Link>
+          ) : (
+            <Link to={'/login'} className="btn btn-sm md:btn-md rounded-lg">
+              Sign In
+            </Link>
+          )}
+
+          <a className="btn btn-sm md:btn-md rounded-lg bg-primary">
+            Be a rider
+          </a>
+        </div>
+
+        <div className="hidden md:block rotate-45">
+          <FaArrowCircleUp className="size-4 md:size-8" />
+        </div>
       </div>
     </div>
   );

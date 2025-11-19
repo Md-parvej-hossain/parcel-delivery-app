@@ -4,9 +4,7 @@ const RevioCard = ({ item }) => {
     
       <div
         className="card bg-[#FFFFFF] shadow-md hover:shadow-xl w-[300px] hover:bg-[#CAEB66] transition duration-300 p-6 rounded-xl flex flex-col "
-        data-aos="flip-left"
-        data-aos-easing="ease-out-cubic"
-        data-aos-duration="2000"
+        
       >
         {/* FIRST DIV → REVIEW TEXT → flex-grow */}
         <div className="flex-grow flex flex-col items-center text-center">
@@ -16,7 +14,7 @@ const RevioCard = ({ item }) => {
         </div>
 
         {/* SECOND DIV → Image + Name */}
-        <div className="flex items-center gap-5 mt-4 w-full">
+        <div className="flex items-center gap-5 mt-4 ">
           <img
             className="h-20 w-20 rounded-full object-cover"
             src={item.img}
