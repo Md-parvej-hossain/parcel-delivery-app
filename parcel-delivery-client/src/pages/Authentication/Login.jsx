@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/incompatible-library */
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import authImg from '../../assets/authImage.png';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../hooks/useAuth';
 const Login = () => {
   const { signInUser, googleSignIn } = useAuth();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -16,6 +17,7 @@ const Login = () => {
     try {
       const result = await signInUser(data.email, data.password);
       console.log(result);
+      navigate('/');
     } catch (err) {
       console.log(err);
     }
@@ -24,6 +26,7 @@ const Login = () => {
     try {
       const result = await googleSignIn();
       console.log(result);
+      navigate('/');
     } catch (err) {
       console.log(err.massage);
     }
