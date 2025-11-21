@@ -3,11 +3,12 @@ import useAuth from '../../hooks/useAuth';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import Loading from '../../components/loading/loading';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router';
 
 const MyParcel = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
-
+const navigate =useNavigate()
   const {
     data: parcels = [],
     isPending,
@@ -34,7 +35,11 @@ const MyParcel = () => {
         try {
           const res = await axiosSecure.delete(`/parcels/${id}`);
           if (res.data.deletedCount > 0) {
-            Swal.fire('Deleted!', 'Parcel has been deleted.', 'success');
+            Swal.fire({
+              title: 'Success!',
+              text: 'Deleted!  Parcel has been deleted .',
+              icon: 'success',
+            });
             refetch();
           }
         } catch (error) {
@@ -43,7 +48,10 @@ const MyParcel = () => {
       }
     });
   };
-
+  const handlePay = id => {
+    console.log(id);
+    navigate(`/dashboard/payment/${id}`);
+  };
   if (isPending) return <Loading />;
 
   return (
@@ -105,7 +113,12 @@ const MyParcel = () => {
                   <button className="btn btn-xs btn-info">View</button>
 
                   {item.payment_status !== 'paid' && (
-                    <button className="btn btn-xs btn-success">Pay</button>
+                    <button
+                      onClick={() => handlePay(item._id)}
+                      className="btn btn-xs btn-success"
+                    >
+                      Pay
+                    </button>
                   )}
 
                   <button

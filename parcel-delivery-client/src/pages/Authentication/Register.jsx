@@ -1,10 +1,12 @@
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import authImg from '../../assets/authImage.png';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../hooks/useAuth';
+import Loading from '../../components/loading/loading';
 
 const Register = () => {
-  const { createUser, googleSignIn } = useAuth();
+  const { createUser, googleSignIn, loading } = useAuth();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -15,6 +17,7 @@ const Register = () => {
     console.log(data);
     try {
       const result = await createUser(data.email, data.password);
+      navigate('/');
       console.log(result);
     } catch (err) {
       console.log(err.massage);
@@ -24,11 +27,13 @@ const Register = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await googleSignIn();
+      navigate('/');
       console.log(result);
     } catch (err) {
       console.log(err.massage);
     }
   };
+  if (loading) return <Loading />;
   return (
     <div className="flex-y-reverse  md:flex items-center justify-center md:my-10">
       <div

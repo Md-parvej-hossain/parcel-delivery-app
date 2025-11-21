@@ -1,11 +1,16 @@
 /* eslint-disable react-hooks/incompatible-library */
-import { Link, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import authImg from '../../assets/authImage.png';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../hooks/useAuth';
+import { useState } from 'react';
+import Loading from '../../components/loading/loading';
 const Login = () => {
-  const { signInUser, googleSignIn } = useAuth();
+  const { signInUser, googleSignIn, loading } = useAuth();
+  const [loginUs, setLoginUs] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromGo = location?.state?.from || '/';
   const {
     register,
     handleSubmit,
@@ -17,7 +22,8 @@ const Login = () => {
     try {
       const result = await signInUser(data.email, data.password);
       console.log(result);
-      navigate('/');
+      setLoginUs(true);
+      navigate(fromGo);
     } catch (err) {
       console.log(err);
     }
@@ -26,11 +32,12 @@ const Login = () => {
     try {
       const result = await googleSignIn();
       console.log(result);
-      navigate('/');
+      navigate(fromGo);
     } catch (err) {
       console.log(err.massage);
     }
   };
+  if (loading) return <Loading />;
   return (
     <div className="flex-y-reverse  md:flex items-center justify-center md:my-10">
       <div
@@ -100,7 +107,7 @@ const Login = () => {
                 type="submit"
                 className="w-full px-8 py-3 font-semibold  bg-primary rounded-md hover:cursor-pointer hover:shadow-md"
               >
-                Sign in
+                {loginUs ? 'Loading...' : ' Sign in'}
               </button>
             </div>
             <p className="px-6 text-sm text-center dark:text-gray-600">

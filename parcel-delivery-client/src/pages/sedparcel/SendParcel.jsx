@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { useLoaderData } from 'react-router';
+import { useLoaderData, useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
 import useAuth from '../../hooks/useAuth';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
@@ -19,6 +19,7 @@ const SendParcel = () => {
   const axiosSecure = useAxiosSecure();
   const regionsDuplicate = serviceCenters.map(c => c.region);
   const regions = [...new Set(regionsDuplicate)];
+  const navigate = useNavigate();
 
   // react-hook-form setup
   const {
@@ -59,7 +60,6 @@ const SendParcel = () => {
         cost = minCharge + extraCharge;
       }
     }
-    console.log('cost', cost);
     Swal.fire({
       title: 'Agree with the Cost?',
       text: `You will be charged ${cost} taka!`,
@@ -79,17 +79,15 @@ const SendParcel = () => {
           createdAt: new Date().toISOString(),
           trackingID: trackingID(),
         };
-        console.log(parcelData);
-        //save data to the server
         setSubmitting(true);
         axiosSecure.post('/parcels', parcelData).then(res => {
           console.log(res.data);
           setSubmitting(false);
+          navigate('/dashboard/myParcel');
           Swal.fire({
-            title: 'Deleted!',
+            title: 'Success!',
             text: 'Your file has been deleted.',
             icon: 'success',
-            timer: 1000,
           });
         });
       }
@@ -129,7 +127,6 @@ const SendParcel = () => {
                   type="radio"
                   value="not-document"
                   className="radio radio-sm"
-                  defaultChecked
                 />
                 <span>Not-Document</span>
               </label>
