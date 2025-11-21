@@ -24,10 +24,15 @@ const Navbar = () => {
       <li className="font-medium text-base text-[#606060]">
         <NavLink to={'/about'}>Pricing</NavLink>
       </li>
+      <li className="font-medium text-base text-[#606060]">
+        <NavLink to={'/sendParcel'}>Send Parcel</NavLink>
+      </li>
       {user && (
-        <li className="font-medium text-base text-[#606060]">
-          <NavLink to={'/sendParcel'}>Send Parcel</NavLink>
-        </li>
+        <>
+          <li className="font-medium text-base text-[#606060]">
+            <NavLink to={'/dashboard'}>Dashboard</NavLink>
+          </li>
+        </>
       )}
 
       <li className="font-medium text-base text-[#606060]">

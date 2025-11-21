@@ -3,16 +3,20 @@ import { useForm, useWatch } from 'react-hook-form';
 import { useLoaderData } from 'react-router';
 import Swal from 'sweetalert2';
 import useAuth from '../../hooks/useAuth';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
+//TrackingID Generate
 const trackingID = () => {
   const date = new Date();
   const datePart = date.toISOString().split('T')[0].replace(/-/g, '');
   const rend = Math.random().toString(36).substring(2, 20).toUpperCase();
   return `PCL-${datePart}-${rend}`;
 };
+
 const SendParcel = () => {
   const [submitting, setSubmitting] = useState(false);
   const serviceCenters = useLoaderData();
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const regionsDuplicate = serviceCenters.map(c => c.region);
   const regions = [...new Set(regionsDuplicate)];
 
@@ -72,17 +76,21 @@ const SendParcel = () => {
           created_by: user?.email,
           payment_status: 'unpaid',
           delivery_status: 'not_collected',
-          creation_date: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
           trackingID: trackingID(),
         };
         console.log(parcelData);
         //save data to the server
-
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'Your file has been deleted.',
-          icon: 'success',
-          timer: 1000,
+        setSubmitting(true);
+        axiosSecure.post('/parcels', parcelData).then(res => {
+          console.log(res.data);
+          setSubmitting(false);
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'Your file has been deleted.',
+            icon: 'success',
+            timer: 1000,
+          });
         });
       }
     });
@@ -91,7 +99,6 @@ const SendParcel = () => {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Send A Parcel</h1>
-
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {/* PARCEL INFO */}
         <section className="bg-white p-6 rounded-lg shadow-sm ">
@@ -153,10 +160,10 @@ const SendParcel = () => {
               <input
                 type="number"
                 step="0.1"
-                disabled={parcelType == 'document'}
+                defaultValue={parcelType === 'document' && 0}
+                disabled={parcelType === 'document'}
                 placeholder="Parcel Weight (KG)"
                 {...register('parcelWeight', {
-                  required: 'Parcel weight is required',
                   min: {
                     value: 0.1,
                     message: 'Weight must be at least 0.1 kg',
