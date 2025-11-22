@@ -49,7 +49,6 @@ const navigate =useNavigate()
     });
   };
   const handlePay = id => {
-    console.log(id);
     navigate(`/dashboard/payment/${id}`);
   };
   if (isPending) return <Loading />;
