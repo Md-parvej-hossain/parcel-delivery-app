@@ -2,9 +2,12 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+// pass b parvej@#$1234
+//SecretKey : sk_test_51SVs8GDMPX4VHdk4zwSTjmPrS3jrOgdm4AFUT2UwmsCVqM0nBHYTXIOym9WzLZXKU7MFpmEOg4RETPTfIQ9D7zpv00htM7PvOa
 const app = express();
 const port = process.env.PORT || 5000;
-
+const stripe = require('stripe')(process.env.VITE_SECRETKEY);
+app.use(express.static('public'));
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -20,6 +23,9 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const parcelCollection = client.db('parcelDeliverDB').collection('parcels');
+    const historyCollection = client
+      .db('parcelDeliverDB')
+      .collection('paymentHistory');
     // post api parcels
     app.post('/parcels', async (req, res) => {
       try {
@@ -69,31 +75,72 @@ async function run() {
       }
     });
 
-
     // //get api parcels
     // app.get('/parcels', async (req, res) => {
     //   const parcels = await parcelCollection.find().toArray();
     //   res.send(parcels);
     // });
 
-    //payment 
+    //payment
     app.post('/create-payment-intent', async (req, res) => {
-      const { payment_method_id, amount } = req.body;
-
+      const amountInCents = req.body.amountInCents;
       try {
         const paymentIntent = await stripe.paymentIntents.create({
-          payment_method: payment_method_id,
-          amount: amount,
+          amount: amountInCents,
           currency: 'usd',
-          confirm: true,
-          error_on_requires_action: true, // Decline if authentication required
+          payment_method_types: ['card'],
         });
-
-        if (paymentIntent.status === 'succeeded') {
-          res.json({ success: true });
-        }
+        res.json({ clientSecret: paymentIntent.client_secret });
       } catch (error) {
-        res.json({ error: error.message });
+        res.status(500).json({ error: error.message });
+      }
+    });
+    //payment history
+    // Successful payment route
+    app.post('/payments/history', async (req, res) => {
+      try {
+        const { parcelId, userEmail, amount, transactionId } = req.body;
+        const parcelQuery = { _id: new ObjectId(parcelId) };
+        const update = { $set: { payment_status: 'paid' } };
+        const updateResult = await parcelCollection.updateOne(
+          parcelQuery,
+          update
+        );
+        if (updateResult.modifiedCount === 0) {
+          return res.status(404).send({ message: 'Parcel not found' });
+        }
+        const paymentData = {
+          parcelId: parcelId,
+          userEmail: userEmail,
+          amount: amount,
+          transactionId: transactionId,
+          status: 'success',
+          createdAt: new Date().toISOString(),
+        };
+        const insertResult = await historyCollection.insertOne(paymentData);
+        res.send({
+          message: 'Payment recorded successfully',
+          payment_history_id: insertResult.insertedId,
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: 'Internal Server Error' });
+      }
+    });
+
+    //get
+    app.get('/payments/history/:email', async (req, res) => {
+      try {
+        const email = req.params.email;
+        const query = email ? { userEmail: email } : {};
+        const options = {
+          sort: { paid_at: -1 },
+        };
+        const history = await paymentsCollection(query, options).toArray();
+        res.send(history);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: 'Internal Server Error' });
       }
     });
 

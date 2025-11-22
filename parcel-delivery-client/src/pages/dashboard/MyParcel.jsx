@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router';
 const MyParcel = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
-const navigate =useNavigate()
+  const navigate = useNavigate();
   const {
     data: parcels = [],
     isPending,
@@ -111,14 +111,13 @@ const navigate =useNavigate()
                 <td className="p-3 space-x-2 whitespace-nowrap">
                   <button className="btn btn-xs btn-info">View</button>
 
-                  {item.payment_status !== 'paid' && (
-                    <button
-                      onClick={() => handlePay(item._id)}
-                      className="btn btn-xs btn-success"
-                    >
-                      Pay
-                    </button>
-                  )}
+                  <button
+                    disabled={item.payment_status == 'paid'}
+                    onClick={() => handlePay(item._id)}
+                    className="btn btn-xs btn-success"
+                  >
+                    Pay
+                  </button>
 
                   <button
                     onClick={() => handleDelete(item._id)}
