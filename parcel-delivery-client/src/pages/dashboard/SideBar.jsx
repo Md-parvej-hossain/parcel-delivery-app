@@ -1,7 +1,10 @@
 import { Link, NavLink } from 'react-router';
 import { IoMdMenu } from 'react-icons/io';
 import ZapShiftLogo from '../../components/shared/Logo/ZapShiftLogo';
+import { MdOutlineHistory } from 'react-icons/md';
 import { IoHomeOutline } from 'react-icons/io5';
+import { MdOutlineSpatialTracking } from 'react-icons/md';
+import { CgProfile } from 'react-icons/cg';
 const SideBar = () => {
   return (
     <div className="drawer lg:drawer-open">
@@ -48,16 +51,19 @@ const SideBar = () => {
           </label>
 
           {/* Menu */}
-          <ul className="menu space-y-1">
+          <ul className="menu space-y-1 ">
             <li>
-              <NavLink to="/dashboard" className="flex items-center gap-2">
+              <NavLink
+                to="/dashboard"
+                className="flex items-center gap-2 text-lg font-medium"
+              >
                 <IoHomeOutline /> Home
               </NavLink>
             </li>
             <li>
               <NavLink
                 to="/dashboard/myParcel"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-lg font-medium"
               >
                 <img
                   className="w-5 h-5"
@@ -65,6 +71,33 @@ const SideBar = () => {
                   alt=""
                 />{' '}
                 My Parcel
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard/paymentHistory"
+                className="flex items-center gap-2 text-lg font-medium"
+              >
+                <MdOutlineHistory />
+                Payment History
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard/track"
+                className="flex items-center gap-2 text-lg font-medium"
+              >
+                <MdOutlineSpatialTracking />
+                Track a Package
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard/profile"
+                className="flex items-center gap-2 text-lg font-medium"
+              >
+                <CgProfile />
+                Profile
               </NavLink>
             </li>
           </ul>

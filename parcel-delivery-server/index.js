@@ -2,15 +2,38 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-// pass b parvej@#$1234
-//SecretKey : sk_test_51SVs8GDMPX4VHdk4zwSTjmPrS3jrOgdm4AFUT2UwmsCVqM0nBHYTXIOym9WzLZXKU7MFpmEOg4RETPTfIQ9D7zpv00htM7PvOa
+const stripe = require('stripe')(process.env.VITE_SECRETKEY);
 const app = express();
 const port = process.env.PORT || 5000;
-const stripe = require('stripe')(process.env.VITE_SECRETKEY);
 app.use(express.static('public'));
+
+const admin = require('firebase-admin');
+const serviceAccount = require('./firebase-adminsdk-key.json');
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
 // Middleware
-app.use(cors());
+
 app.use(express.json());
+app.use(cors());
+//custom middlewares
+const verifyFBToken = async (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(401).send({ massage: 'unauthorized access' });
+  }
+  //verify the token
+  try {
+    const idToken = token.split(' ')[1];
+    const decoded = await admin.auth().verifyIdToken(idToken);
+    req.decoded_email = decoded.email;
+    next();
+  } catch (error) {
+    return res.status(403).send({ massage: 'forbidden access' });
+  }
+};
+
 const uri = `mongodb+srv://${process.env.VITE_USER}:${process.env.VITE_PASS}@cluster0.mcpcj.mongodb.net/?appName=Cluster0`;
 const client = new MongoClient(uri, {
   serverApi: {
@@ -23,9 +46,11 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const parcelCollection = client.db('parcelDeliverDB').collection('parcels');
+    const userCollection = client.db('parcelDeliverDB').collection('users');
     const historyCollection = client
       .db('parcelDeliverDB')
       .collection('paymentHistory');
+
     // post api parcels
     app.post('/parcels', async (req, res) => {
       try {
@@ -64,6 +89,14 @@ async function run() {
       }
     });
 
+    //tracking
+    // app.post('/tracking', (req, res) => {
+    //   const { } = req.body;
+    //   const log = {
+
+    //   }
+    // });
+
     app.delete('/parcels/:id', async (req, res) => {
       try {
         const id = req.params.id;
@@ -74,13 +107,19 @@ async function run() {
         res.status(500).send({ error: error.message });
       }
     });
-
-    // //get api parcels
-    // app.get('/parcels', async (req, res) => {
-    //   const parcels = await parcelCollection.find().toArray();
-    //   res.send(parcels);
-    // });
-
+    // user api
+    app.post('/users', async (req, res) => {
+      const email = req.body.email;
+      const userExists = await userCollection.findOne({ email });
+      if (userExists) {
+        return res
+          .status(200)
+          .send({ massage: 'User already exists', inserted: false });
+      }
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+    });
     //payment
     app.post('/create-payment-intent', async (req, res) => {
       const amountInCents = req.body.amountInCents;
@@ -129,14 +168,15 @@ async function run() {
     });
 
     //get
-    app.get('/payments/history/:email', async (req, res) => {
+    app.get('/payments/history', verifyFBToken, async (req, res) => {
       try {
-        const email = req.params.email;
+        const email = req.query.email;
+        console.log(email);
         const query = email ? { userEmail: email } : {};
         const options = {
           sort: { paid_at: -1 },
         };
-        const history = await paymentsCollection(query, options).toArray();
+        const history = await historyCollection.find(query, options).toArray();
         res.send(history);
       } catch (error) {
         console.error(error);

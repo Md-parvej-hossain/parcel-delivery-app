@@ -3,10 +3,16 @@ import authImg from '../../assets/authImage.png';
 import { useForm } from 'react-hook-form';
 import useAuth from '../../hooks/useAuth';
 import Loading from '../../components/loading/loading';
+import toast from 'react-hot-toast';
+import axios from 'axios';
+import { useState } from 'react';
+import useAxios from '../../hooks/useAxios';
 
 const Register = () => {
-  const { createUser, googleSignIn, loading } = useAuth();
+  const { createUser, googleSignIn, loading, updateUserProfile } = useAuth();
   const navigate = useNavigate();
+  const [imgUrl, setImgUrl] = useState('');
+  const axiosInstance = useAxios();
   const {
     register,
     handleSubmit,
@@ -17,6 +23,19 @@ const Register = () => {
     console.log(data);
     try {
       const result = await createUser(data.email, data.password);
+      //update userInfo in the database
+      const userInfo = {
+        email: data.email,
+        role: 'user',
+        created_at: new Date().toISOString(),
+        last_log_in: new Date().toISOString(),
+      };
+      const userRas = await axiosInstance.post('/users', userInfo);
+      console.log(userRas.data);
+
+      //update user profile in firebase
+      await updateUserProfile(data.name, imgUrl);
+      toast.success('Login Success!');
       navigate('/');
       console.log(result);
     } catch (err) {
@@ -27,11 +46,25 @@ const Register = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await googleSignIn();
+      toast.success('Login Success!');
       navigate('/');
       console.log(result);
     } catch (err) {
       console.log(err.massage);
     }
+  };
+  const handleimgUpload = async e => {
+    const img = e.target.files[0];
+    console.log(img);
+    const fromData = new FormData();
+    fromData.append('image', img);
+    const res = await axios.post(
+      `https://api.imgbb.com/1/upload?expiration=600&key=${
+        import.meta.env.VITE_Image_upload_key
+      }`,
+      fromData
+    );
+    setImgUrl(res.data.data.url);
   };
   if (loading) return <Loading />;
   return (
@@ -52,6 +85,7 @@ const Register = () => {
           className="space-y-8"
         >
           <div className="space-y-4">
+            {/* name field */}
             <div>
               <label htmlFor="email" className="block mb-2 text-sm">
                 Name
@@ -68,6 +102,22 @@ const Register = () => {
                 <p className="text-red-500">Password is required </p>
               )}
             </div>
+            {/* img field*/}
+            <div>
+              <label htmlFor="email" className="block mb-2 text-sm">
+                Img
+              </label>
+              <input
+                onChange={handleimgUpload}
+                type="file"
+                name="img"
+                id="img"
+                title="Enter your img"
+                placeholder="Your img"
+                className="w-full px-3 py-2 border rounded-md dark:border-gray-300 dark:bg-gray-50 dark:text-gray-800 "
+              />
+            </div>
+            {/* email field */}
             <div>
               <label htmlFor="email" className="block mb-2 text-sm">
                 Email address
@@ -84,6 +134,7 @@ const Register = () => {
                 <p className="text-red-500">Password is required </p>
               )}
             </div>
+            {/* password field  */}
             <div>
               <div className="flex justify-between mb-2">
                 <label htmlFor="password" className="text-sm">

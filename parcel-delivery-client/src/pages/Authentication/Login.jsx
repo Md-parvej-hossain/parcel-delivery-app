@@ -5,9 +5,12 @@ import { useForm } from 'react-hook-form';
 import useAuth from '../../hooks/useAuth';
 import { useState } from 'react';
 import Loading from '../../components/loading/loading';
+import toast from 'react-hot-toast';
+import useAxios from '../../hooks/useAxios';
 const Login = () => {
   const { signInUser, googleSignIn, loading } = useAuth();
   const [loginUs, setLoginUs] = useState(false);
+  const axiosInstance = useAxios();
   const navigate = useNavigate();
   const location = useLocation();
   const fromGo = location?.state?.from || '/';
@@ -23,6 +26,7 @@ const Login = () => {
       const result = await signInUser(data.email, data.password);
       console.log(result);
       setLoginUs(true);
+      toast.success('Login Success!');
       navigate(fromGo);
     } catch (err) {
       console.log(err);
@@ -31,7 +35,17 @@ const Login = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await googleSignIn();
+      const user = result.user;
+      const userInfo = {
+        email: user.email,
+        role: 'user',
+        created_at: new Date().toISOString(),
+        last_log_in: new Date().toISOString(),
+      };
+      const userRas = await axiosInstance.post('/users', userInfo);
+      console.log(userRas.data);
       console.log(result);
+      toast.success('Login Success!');
       navigate(fromGo);
     } catch (err) {
       console.log(err.massage);

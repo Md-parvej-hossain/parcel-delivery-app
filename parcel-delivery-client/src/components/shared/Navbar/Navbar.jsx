@@ -2,10 +2,12 @@ import { Link, NavLink } from 'react-router';
 import ZapShiftLogo from '../Logo/ZapShiftLogo';
 import { FaArrowCircleUp } from 'react-icons/fa';
 import useAuth from '../../../hooks/useAuth';
+import toast from 'react-hot-toast';
 const Navbar = () => {
   const { user, signOutUser } = useAuth();
   const handleSignOut = () => {
     signOutUser();
+    toast.success('Login Success!');
   };
   const navLinks = (
     <>
@@ -36,7 +38,7 @@ const Navbar = () => {
       )}
 
       <li className="font-medium text-base text-[#606060]">
-        <NavLink to={'/about'}>Be a Rider</NavLink>
+        <NavLink to={'/BeaRider'}>Be a Rider</NavLink>
       </li>
     </>
   );
@@ -94,9 +96,12 @@ const Navbar = () => {
             </Link>
           )}
 
-          <a className="btn btn-sm md:btn-md rounded-lg bg-primary">
+          <Link
+            to={user ? '/BeaRider' : '/login'}
+            className="btn btn-sm md:btn-md rounded-lg bg-primary"
+          >
             Be a rider
-          </a>
+          </Link>
         </div>
 
         <div className="hidden md:block rotate-45">

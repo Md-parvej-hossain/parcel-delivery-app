@@ -11,6 +11,9 @@ import DashboardLayout from '../layouts/DashboardLayout';
 import Dashboard from '../pages/dashboard/Dashboard';
 import MyParcel from '../pages/dashboard/MyParcel';
 import Payment from '../pages/dashboard/payment/Payment';
+import PaymentHistory from '../pages/dashboard/payment/PaymentHistory';
+import Profile from '../pages/dashboard/userProfail/Profile';
+import BeARider from '../pages/dashboard/BeARider/BeARider';
 
 export const router = createBrowserRouter([
   {
@@ -35,6 +38,14 @@ export const router = createBrowserRouter([
         ),
         loader: () => fetch('./warehouses.json'),
       },
+      {
+        path: 'BeaRider',
+        element: (
+          <PrivateRoute>
+            <BeARider />
+          </PrivateRoute>
+        ),
+      },
     ],
   },
   //Dashboard layout
@@ -57,6 +68,14 @@ export const router = createBrowserRouter([
       {
         path: 'payment/:id',
         element: <Payment />,
+      },
+      {
+        path: 'paymentHistory',
+        element: <PaymentHistory />,
+      },
+      {
+        path: 'profile',
+        element: <Profile />,
       },
     ],
   },
