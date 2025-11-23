@@ -96,7 +96,7 @@ async function run() {
       }
     });
     //payment history
-    // Successful payment route
+    //Successful payment route
     app.post('/payments/history', async (req, res) => {
       try {
         const { parcelId, userEmail, amount, transactionId } = req.body;
