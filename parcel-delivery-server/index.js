@@ -47,6 +47,7 @@ async function run() {
   try {
     const parcelCollection = client.db('parcelDeliverDB').collection('parcels');
     const userCollection = client.db('parcelDeliverDB').collection('users');
+    const riderCollection = client.db('parcelDeliverDB').collection('riders');
     const historyCollection = client
       .db('parcelDeliverDB')
       .collection('paymentHistory');
@@ -182,6 +183,56 @@ async function run() {
         console.error(error);
         res.status(500).send({ message: 'Internal Server Error' });
       }
+    });
+    //riders
+    app.post('/rider', async (req, res) => {
+      const riderData = req.body;
+      const result = await riderCollection.insertOne(riderData);
+      res.send(result);
+    });
+    app.patch('/riders/:id/status', async (req, res) => {
+      const { id } = req.params;
+      const { status } = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: { status: status },
+      };
+      try {
+        const result = await riderCollection.updateOne(filter, updateDoc);
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: 'Failed to update right status' });
+      }
+    });
+    //pending riders
+    app.get('/riders/pending', async (req, res) => {
+      try {
+        const pendingRiders = await riderCollection
+          .find({ status: 'pending' })
+          .toArray();
+        res.send(pendingRiders);
+      } catch (error) {
+        console.log('Failed to load pending riders:', error);
+        res.status(500).send({ message: 'Failed to load panding riders' });
+      }
+    });
+
+    app.get('/riders/active', async (req, res) => {
+      const result = await riderCollection
+        .find({ status: 'Approve' })
+        .toArray();
+      res.send(result);
+    });
+    app.patch('/riders/:id/status', async (req, res) => {
+      const id = req.params.id;
+      const { status } = req.body;
+
+      const result = await riderCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { status } }
+      );
+
+      res.send({ success: result.modifiedCount > 0 });
     });
 
     await client.db('admin').command({ ping: 1 });

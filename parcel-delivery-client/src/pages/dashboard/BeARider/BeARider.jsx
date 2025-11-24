@@ -1,70 +1,46 @@
-import { useForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
-
+import { useForm, useWatch } from 'react-hook-form';
 
 import useAuth from '../../../hooks/useAuth';
+import { useLoaderData } from 'react-router';
+import toast from 'react-hot-toast';
+import useAxiosSecure from './../../../hooks/useAxiosSecure';
 
 const BeARider = () => {
   const { user } = useAuth();
-
+  const serviceCenters = useLoaderData();
+  const axiosSecure = useAxiosSecure();
   const {
     register,
     handleSubmit,
-    reset,
-    watch,
+    control,
     formState: { errors },
   } = useForm();
-
-  const [centers, setCenters] = useState([]);
-  const [regions, setRegions] = useState([]);
-  const [districts, setDistricts] = useState([]);
-
-  const selectedRegion = watch('region');
-
-  // Load Service Centers
-  useEffect(() => {
-    const load = async () => {
-      const res = await fetch('/serviceCenters.json'); // OR your API
-      const data = await res.json();
-      setCenters(data);
-
-      const r = [...new Set(data.map(c => c.region))];
-      setRegions(r);
-    };
-    load();
-  }, []);
-
-  // On region change → load districts
-  useEffect(() => {
-    if (selectedRegion) {
-      const filtered = centers
-        .filter(c => c.region === selectedRegion)
-        .map(c => c.district);
-      setDistricts(filtered);
-    } else {
-      setDistricts([]);
-    }
-  }, [selectedRegion, centers]);
+  const regionsDuplicate = serviceCenters.map(c => c.region);
+  const regions = [...new Set(regionsDuplicate)];
+  const riderRegion = useWatch({ control, name: 'region' });
+  const districtsByRegion = region => {
+    const regionDistricts = serviceCenters.filter(c => c.region === region);
+    const districts = regionDistricts.map(d => d.district);
+    return districts;
+  };
 
   // Submit handler
   const onSubmit = async data => {
     const finalData = {
       ...data,
-      name: user?.displayName,
       email: user?.email,
       status: 'pending',
       createdAt: new Date().toISOString(),
     };
-
+    console.log(finalData);
     try {
-      // const res = await axiosSecure.post('/riderApplications', finalData);
-
+      const res = await axiosSecure.post('/rider', finalData);
+      console.log(res);
       if (res.data.insertedId) {
-        alert('Rider application submitted successfully!');
-        reset();
+        toast.success('From successfully submit');
       }
     } catch (err) {
-      alert('Something went wrong! Please try again.');
+      toast.error('Something went wrong! Please try again.');
       console.log(err);
     }
   };
@@ -84,9 +60,8 @@ const BeARider = () => {
           <label className="label font-semibold">Name</label>
           <input
             type="text"
-            value={user?.displayName || ''}
-            readOnly
-            className="input input-bordered bg-gray-100"
+            className="input input-bordered "
+            {...register('name', { required: 'Name is required' })}
           />
         </div>
 
@@ -128,7 +103,7 @@ const BeARider = () => {
             {...register('district', { required: 'District is required' })}
           >
             <option value="">Select District</option>
-            {districts.map((district, idx) => (
+            {districtsByRegion(riderRegion).map((district, idx) => (
               <option key={idx} value={district}>
                 {district}
               </option>
@@ -165,7 +140,7 @@ const BeARider = () => {
         <div className="form-control">
           <label className="label font-semibold">National ID Number</label>
           <input
-            type="text"
+            type="number"
             placeholder="Enter NID number"
             className="input input-bordered"
             {...register('nid', {
@@ -203,7 +178,7 @@ const BeARider = () => {
             Bike Registration Number
           </label>
           <input
-            type="text"
+            type="number"
             placeholder="Registration Number"
             className="input input-bordered"
             {...register('bikeRegistration', {

@@ -5,6 +5,7 @@ import { MdOutlineHistory } from 'react-icons/md';
 import { IoHomeOutline } from 'react-icons/io5';
 import { MdOutlineSpatialTracking } from 'react-icons/md';
 import { CgProfile } from 'react-icons/cg';
+import { FaUserCheck, FaUserClock } from 'react-icons/fa';
 const SideBar = () => {
   return (
     <div className="drawer lg:drawer-open">
@@ -89,6 +90,27 @@ const SideBar = () => {
               >
                 <MdOutlineSpatialTracking />
                 Track a Package
+              </NavLink>
+            </li>
+            {/* Active Riders */}
+            <li>
+              <NavLink
+                to="/dashboard/active-riders"
+                className="flex items-center gap-2 text-lg font-medium"
+              >
+                <FaUserCheck className="text-green-600" />
+                Active Riders
+              </NavLink>
+            </li>
+
+            {/* Pending Riders */}
+            <li>
+              <NavLink
+                to="/dashboard/pending-riders"
+                className="flex items-center gap-2 text-lg font-medium"
+              >
+                <FaUserClock className="text-yellow-600" />
+                Pending Riders
               </NavLink>
             </li>
             <li>

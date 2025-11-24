@@ -14,6 +14,8 @@ import Payment from '../pages/dashboard/payment/Payment';
 import PaymentHistory from '../pages/dashboard/payment/PaymentHistory';
 import Profile from '../pages/dashboard/userProfail/Profile';
 import BeARider from '../pages/dashboard/BeARider/BeARider';
+import PendingRiders from '../pages/dashboard/BeARider/PandingRiders';
+import ActiveRiders from '../pages/dashboard/BeARider/ActiveRiders';
 
 export const router = createBrowserRouter([
   {
@@ -45,6 +47,7 @@ export const router = createBrowserRouter([
             <BeARider />
           </PrivateRoute>
         ),
+        loader: () => fetch('./warehouses.json'),
       },
     ],
   },
@@ -76,6 +79,14 @@ export const router = createBrowserRouter([
       {
         path: 'profile',
         element: <Profile />,
+      },
+      {
+        path: 'pending-riders',
+        element: <PendingRiders />,
+      },
+      {
+        path: 'active-riders',
+        element: <ActiveRiders />,
       },
     ],
   },
