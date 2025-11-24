@@ -21,32 +21,6 @@ const PendingRiders = () => {
       return res.data;
     },
   });
-
-  // Approve / Reject Rider
-  const handleStatusChange = async (id, action) => {
-    const text = action === 'approve' ? 'Approve' : 'Reject';
-    const confirm = await Swal.fire({
-      title: `${text} Application?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes',
-      cancelButtonText: 'Cancel',
-    });
-    if (!confirm.isConfirmed) return;
-    try {
-      const res = await axiosSecure.patch(`/riders/${id}/status`, {
-        status: text, // "approve" or "reject"
-      });
-      refetch();
-      if (res.data.success) {
-        Swal.fire('Success', `Rider ${text.toLowerCase()}d!`, 'success');
-      }
-    } catch (error) {
-      Swal.fire('Error', 'Failed to update rider status', 'error');
-      console.log(error);
-    }
-  };
-
   // Loading Spinner
   if (isLoading) {
     return (
@@ -55,6 +29,33 @@ const PendingRiders = () => {
       </div>
     );
   }
+  // Approve / Reject Rider
+
+  const handleDecision = async (id, action, email) => {
+    const confirm = await Swal.fire({
+      title: `${action === 'approve' ? 'Approve' : 'Reject'} Application?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'Cancel',
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const status = action === 'approve' ? 'active' : 'rejected';
+      await axiosSecure.patch(`/riders/${id}/status`, {
+        status,
+        email,
+      });
+
+      refetch();
+
+      Swal.fire('Success', `Rider ${action}d successfully`, 'success');
+    } catch (err) {
+      Swal.fire('Error', 'Could not update rider status', err);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -102,7 +103,9 @@ const PendingRiders = () => {
                   {/* Approve */}
                   <button
                     className="btn btn-sm btn-success text-white"
-                    onClick={() => handleStatusChange(rider._id, 'approve')}
+                    onClick={() =>
+                      handleDecision(rider._id, 'approve', rider.email)
+                    }
                   >
                     <FaCheckCircle />
                   </button>
@@ -110,7 +113,9 @@ const PendingRiders = () => {
                   {/* Reject */}
                   <button
                     className="btn btn-sm btn-error text-white"
-                    onClick={() => handleStatusChange(rider._id, 'reject')}
+                    onClick={() =>
+                      handleDecision(rider._id, 'reject', rider.email)
+                    }
                   >
                     <FaTimesCircle />
                   </button>

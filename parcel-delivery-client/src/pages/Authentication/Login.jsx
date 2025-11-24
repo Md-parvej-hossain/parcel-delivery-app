@@ -126,7 +126,11 @@ const Login = () => {
             </div>
             <p className="px-6 text-sm text-center dark:text-gray-600">
               Don’t have any account?{' '}
-              <Link className="text-secondary" to={'/register'}>
+              <Link
+                state={{ fromGo }}
+                className="text-secondary"
+                to={'/register'}
+              >
                 Register
               </Link>
               .

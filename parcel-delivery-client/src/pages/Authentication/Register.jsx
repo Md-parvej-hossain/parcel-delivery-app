@@ -13,6 +13,7 @@ const Register = () => {
   const navigate = useNavigate();
   const [imgUrl, setImgUrl] = useState('');
   const axiosInstance = useAxios();
+  const fromGo = location?.state?.from || '/';
   const {
     register,
     handleSubmit,
@@ -36,7 +37,7 @@ const Register = () => {
       //update user profile in firebase
       await updateUserProfile(data.name, imgUrl);
       toast.success('Login Success!');
-      navigate('/');
+      navigate(fromGo);
       console.log(result);
     } catch (err) {
       console.log(err.massage);
@@ -47,7 +48,7 @@ const Register = () => {
     try {
       const result = await googleSignIn();
       toast.success('Login Success!');
-      navigate('/');
+      navigate(fromGo);
       console.log(result);
     } catch (err) {
       console.log(err.massage);

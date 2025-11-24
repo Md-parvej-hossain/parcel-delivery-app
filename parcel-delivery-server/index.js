@@ -218,21 +218,41 @@ async function run() {
     });
 
     app.get('/riders/active', async (req, res) => {
-      const result = await riderCollection
-        .find({ status: 'Approve' })
-        .toArray();
+      const result = await riderCollection.find({ status: 'active' }).toArray();
       res.send(result);
     });
     app.patch('/riders/:id/status', async (req, res) => {
-      const id = req.params.id;
-      const { status } = req.body;
+      const { id } = req.params;
+      const { status, email } = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          status,
+        },
+      };
 
-      const result = await riderCollection.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: { status } }
-      );
+      try {
+        const result = await riderCollection.updateOne(query, updateDoc);
 
-      res.send({ success: result.modifiedCount > 0 });
+        // update user role for accepting rider
+        if (status === 'active') {
+          const userQuery = { email };
+          const userUpdateDoc = {
+            $set: {
+              role: 'rider',
+            },
+          };
+          const roleResult = await userCollection.updateOne(
+            userQuery,
+            userUpdateDoc
+          );
+          console.log(roleResult.modifiedCount);
+        }
+
+        res.send(result);
+      } catch (err) {
+        res.status(500).send({ message: 'Failed to update rider status' });
+      }
     });
 
     await client.db('admin').command({ ping: 1 });
